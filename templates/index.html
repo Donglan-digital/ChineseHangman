@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>猜句子游戏&nbspChinese Hangman</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", "SimHei", sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .sentence-display {
+            font-size: 2em;
+            margin: 20px 0;
+            line-height: 1.5;
+            color: #333;
+        }
+        .hint {
+            font-size: 1.2em;
+            color: #666;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #fff3cd;
+            border-radius: 5px;
+        }
+        .game-info {
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+        .guess-form {
+            margin: 20px 0;
+        }
+        .guess-input {
+            font-size: 1.5em;
+            width: 50px;
+            text-align: center;
+            margin-right: 10px;
+            padding: 5px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .button {
+            font-size: 1.2em;
+            padding: 5px 15px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .message.success {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        .message.danger {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        .message.warning {
+            background-color: #fcf8e3;
+            color: #8a6d3b;
+            border: 1px solid #faebcc;
+        }
+        .message.info {
+            background-color: #d9edf7;
+            color: #31708f;
+            border: 1px solid #bce8f1;
+        }
+        .tries-remaining {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .game-over {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+        .win {
+            color: #27ae60;
+        }
+        .lose {
+            color: #c0392b;
+        }
+        .guessed-chars {
+            font-size: 1.2em;
+            color: #666;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>一起来玩猜中文句子游戏吧！</h1>
+        <h1>Let's guess Chinese sentences!</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="hint">
+            提示：{{ hint }}
+        </div>
+
+        <div class="sentence-display">
+            {{ display_sentence }}
+        </div>
+
+        <div class="game-info">
+            <p class="guessed-chars">已猜过的汉字&nbspGuessed characters：{{ guessed_chars }}</p>
+            <p>剩余的机会&nbspRemaining tries：<span class="tries-remaining">{{ tries_remaining }}/{{ max_tries }}</span></p>
+        </div>
+
+        {% if game_over %}
+            <div class="game-over {% if won %}win{% else %}lose{% endif %}">
+                {% if won %}
+                    🎉 恭喜你猜对了！&nbspYou win! 🎉
+                {% else %}
+                    游戏结束！Game over!&nbsp正确的句子是：The correct sentence is: <strong>{{ sentence }}</strong>
+                {% endif %}
+            </div>
+            <form action="{{ url_for('new_game') }}">
+                <button class="button" type="submit">开始新游戏&nbspNew sentence</button>
+            </form>
+        {% else %}
+            <form class="guess-form" action="{{ url_for('guess') }}" method="post">
+                <input class="guess-input" type="text" name="guess" maxlength="1" required autofocus>
+                <button class="button" type="submit">猜一猜&nbspGuess a character</button>
+            </form>
+        {% endif %}
+    </div>
+</body>
+</html>
